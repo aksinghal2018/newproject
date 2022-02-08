@@ -1,0 +1,17 @@
+{
+    "_id": {
+        "$oid": "61cc054f8ab0b9c8c91a0698"
+    },
+"subImages_id":["A.jpg","B.jpg"],
+"category_id":ObjectId("61cbfdd5d40c82bb0266165a"),
+"color_id":ObjectId("61cbfc49d40c82bb02661655"),
+"product_name":"WinchesterFabricSofa",
+"product_image":"2019-06-24T11-25-49.768ZFNSF51WCCO3_-_main_2.jpg",
+"product_desc":"Sincesofasaremanufacturedagainstyourorder,werequireyoutopayanadvanceof25%ofthetotalamount.Wewillcollectthebalance(throughthecardondeliveryoption)whenwedelivertheproduct.However,ifyouwanttopayinfull(toavailofcreditcardEMI,forinstance),pleasecallusat080-67400200(Monday-Saturday,10AM-8PM)andwecanhelpyouout."
+,"product_rating":"3.34",
+"product_producer":"WinchesterPvt.Ltd.",
+"product_cost":"59999",
+"product_stock":"443",
+"product_dimension":"84*28",
+"product_material":"Cobalt,Material"
+}
