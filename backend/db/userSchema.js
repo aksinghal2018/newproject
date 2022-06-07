@@ -31,6 +31,9 @@ const userSchema = new mongoose.Schema({
     Address:{
         type:Array
     },
+    Notifications:{
+        type:Array
+    },
     type:{
         type:String
     }

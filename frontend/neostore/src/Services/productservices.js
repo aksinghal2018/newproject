@@ -8,6 +8,9 @@ const header={'headers': {
 export const getproducts=()=>{
     return(axios.get(`${url}/getproduct`))
 }
+export const getproductsname=(data)=>{
+    return(axios.post(`${url}/getproductname`,data))
+}
 export const getcategory=()=>{
     return(axios.get(`${url}/getcategory`))
 }
@@ -22,4 +25,16 @@ export const getproductsbyiddata=(id)=>{
 }
 export const getproductsbyidcolor=(id)=>{
     return(axios.get(`${url}/getproductbycolor/${id}`))
+}
+export const deleteproduct=(data)=>{
+    return(axios.post(`${url}/deleteproducts`,data,header))
+}
+export const updateproduct=(data)=>{
+    return(axios.post(`${url}/updateproduct`,data))
+}
+export const authenticatetoken=()=>{
+    return(axios.get(`${url}/authenticatetoken`,header))
+}
+export const getNotificaitiondata=()=>{
+    return(axios.post(`${url}/getnotificationdata`,{},header))
 }

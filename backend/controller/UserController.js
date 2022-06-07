@@ -2,16 +2,21 @@ const jsonwebtoken=require('jsonwebtoken')
 const jsonsecret="5sa5sa67s66s66sa6saww"
 const main=require('../Sendmail/Sendmail')
 const userModel=require('../db/userSchema.js');
+const adminuserModel=require('../db/adminuserSchema.js');
+
+const productModel=require('../db/Products/productSchema');
 const cartModel=require('../db/Products/cartSchema');
 const orderModel=require('../db/Products/orderSchema');
 const tokenModel=require('../db/TokenSchema');
+const notificationModel=require('../db/NotificationSchema')
 const crypto =require('crypto')
 const bcrypt = require('bcrypt');
 const multer =require('multer')
 const path=require('path')
 
 const fs=require('fs')
-const invoicegeneate=require('../controller/Invoicegenerate')
+const invoicegeneate=require('../controller/Invoicegenerate');
+const NotificationSchema = require('../db/NotificationSchema');
 //getting all product 
 const autenticateToken= async(req,res,next)=>{
     if(req!=undefined){
@@ -200,7 +205,8 @@ const getUser= async (req, res , next)=>{
                     "gender": data[0].gender,
                     "userid":data[0]._id,
                     "profile_img":data[0].profile_img,
-                    "address":data[0].Address
+                    "address":data[0].Address,
+                    "usertype":data[0].type
                 }
                 console.log(data1)
                 if(data.length==0){
@@ -225,6 +231,59 @@ const getUser= async (req, res , next)=>{
             
         }
     })
+}
+const adminloginUser= async (req, res , next)=>{
+    let email=req.body.email;
+let password=req.body.password
+const saltRounds = 10;
+console.log(email,password)
+let token=jsonwebtoken.sign({ UID:email },jsonsecret,{ expiresIn: 60*60 }) //1 minute expire time for jwt token
+adminuserModel.find({$and:[{email:email}]},(err,data)=>{
+    if(err){
+        res.json({"success" : false,err:err,message:"incorrect username And password."})
+    }   
+    else{
+        console.log(data)
+        if(data.length==0){
+            res.json({"success" : false,err:"user not exist",message:"incorrect username And password."})
+        }
+        else{
+        bcrypt.compare(password, data[0].password, function(err, result) {
+            if(result){
+                const data1={
+                "first_name": data[0].first_name,
+                "last_name": data[0].last_name,
+                "email" : data[0].email ,
+                "phone_no": data[0].phone_no,
+                "gender": data[0].gender,
+                "userid":data[0]._id,
+                "profile_img":data[0].profile_img,
+                "address":data[0].Address,
+                "usertype":data[0].type
+            }
+            console.log(data1)
+            if(data.length==0){
+                res.json({"success" : false,err:"user not exist",message:"incorrect username And password."})
+            }
+            else{
+                res.json({"success" : true,
+            "status_code": 200,
+            "message": "You have logged In",
+              "customer_details": data1,
+              "token":token
+            });
+            }
+        }   
+        else{
+            res.json({"success" : false,err:err,message:"incorrect username And password."})
+        }     
+        
+        });
+
+    }
+        
+    }
+})
 }
 const deleteUser= async (req, res , next)=>{
     let id=req.params.id;
@@ -436,21 +495,36 @@ const checkout= async (req, res , next)=>{
     const data={email:req.body.email,order_data:req.body.order_data,address:req.body.address,paymentmethod:req.body.paymentmethod}
     const ins=orderModel(data)
     console.log(data)
-    ins.save((err,result)=>{
-        if (err) {
+    req.body.order_data.map((item=>{
+        console.log(item.id)
+        productModel.findOneAndUpdate({_id:item.id},{$inc:{"product_stock":-item.quantity}}).exec((err,data)=>{
             console.log(err)
-            res.json({data:"error"})
-        }
-        else{
-            console.log("checkout done")
-            res.json({data:result})
-        }
-    })
+            //console.log(data)
+        })
+    }))
+    ins.save((err,result)=>{
+         if (err) {
+             console.log(err)
+             res.json({data:"error"})
+         }
+         else{
+             console.log("checkout done")
+             res.json({data:result})
+         }
+     })
     console.log("checkout")
 }
 
 const getorder=async(req,res,next)=>{
     orderModel.find({email:req.body.email},(err,result)=>{
+        if(err) {res.json({err:"err"})}
+        else{
+            res.json({data:result})
+        }
+    })
+}
+const getAllorder=async(req,res,next)=>{
+    orderModel.find({}).sort({order_date:-1}).exec((err,result)=>{
         if(err) {res.json({err:"err"})}
         else{
             res.json({data:result})
@@ -480,4 +554,65 @@ const getinvoice=async(req,res,next)=>{
         res.json({data:`${req.body.orderid}.pdf`})
     })
 }
-module.exports= {registerUser,registerUserbySocial,getUser,loginUser,deleteUser,updateUser,forgetPasswordUser,updatePasswordUser,changeprofileimage,addAddress,updateAddress,deleteAddress,getCart,updateCart,checkout,removecart,getorder,getinvoice,autenticateToken}
+const addNotificatons=async(req,res,next)=>{
+    console.log(req.body)
+    const dataitem = { product_id:req.body.product_id,user_id:req.body.user_id }
+    notificationModel.find({product_id:req.body.product_id,user_id:req.body.user_id},(err,data)=>{
+        if(data.length==0){
+
+            const ins=notificationModel(dataitem)
+            ins.save((err) => {
+                 console.log(err)
+                 if (err) { res.json({ "success": false, err: "notification already added", message: "notification already added." }) }
+                 else {
+                     res.json({
+                         "err": 0,
+                         "success": true,
+                         "status_code": 200,
+                         "message": `notificaition added successfully`
+                     });
+                 }
+             })
+        }
+        else{
+            console.log("already added notificaiton")
+            res.json({"success":true})
+        }
+    })
+       
+}
+const getNotificatons=async(req,res,next)=>{
+    console.log(req.body)
+    const dataitem = { user_id:req.body.user_id }
+    userModel.find({_id:req.body.user_id},(err,data)=>{
+        console.log(data)
+            if (err) { res.json({ "success": false, err: "notification already added", message: "notification already added." }) }
+                 else {
+                     res.json({
+                         "err": 0,
+                         "success": true,
+                         "status_code": 200,
+                         "data":data
+                     });
+                 }
+     
+    })
+       
+}
+const deleteNotification=async(req,res,next)=>{
+    console.log(req.body)
+    const userid=req.body.userid
+    const index=req.body.index
+    userModel.find({_id:userid},(err,data)=>{
+        if(err) throw err
+        var notifications=data[0].Notifications
+        console.log(data)
+        notifications.splice(index,1)
+        userModel.updateOne({_id:userid},{Notifications:notifications}).exec((err,data)=>{
+            console.log(err)
+            console.log(data)
+            res.json({Status:true,data:data})
+        })
+    })
+}
+module.exports= {registerUser,registerUserbySocial,getUser,loginUser,adminloginUser,deleteUser,updateUser,forgetPasswordUser,updatePasswordUser,changeprofileimage,addAddress,updateAddress,deleteAddress,getCart,updateCart,checkout,removecart,getorder,getinvoice,autenticateToken,getAllorder,addNotificatons,getNotificatons,deleteNotification}

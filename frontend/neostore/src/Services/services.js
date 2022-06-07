@@ -14,6 +14,9 @@ export const registeruserbysocial=(data)=>{
 export const loginuser=(data)=>{
     return(axios.post(`${url}/checkuser`,data))
 }
+export const adminloginuser=(data)=>{
+    return(axios.post(`${url}/adminloginuser`,data))
+}
 export const forgetpassworduser=(data)=>{
     return(axios.post(`${url}/forgetpassword`,data))
 }
@@ -59,7 +62,23 @@ export const getorder=(data)=>{
     //console.log(data)
     return(axios.post(`${url}/getorder`,data,header))
 }
+export const getAllorder=()=>{
+    //console.log(data)
+    return(axios.get(`${url}/getAllorder`,header))
+}
 export const getinvoice=(data)=>{
     //console.log(data)
     return(axios.post(`${url}/getinvoice`,data,header))
+}
+export const addNotifcation=(data)=>{
+    //console.log(data)
+    return(axios.post(`${url}/addnotification`,data,header))
+}
+export const getNotificaitons=(data)=>{
+    //console.log(data)
+    return(axios.post(`${url}/getNotifications`,data,header))
+}
+export const deleteNotificaitons=(data)=>{
+    //console.log(data)
+    return(axios.post(`${url}/deleteNotifications`,data,header))
 }

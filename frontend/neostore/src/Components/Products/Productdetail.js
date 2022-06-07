@@ -191,7 +191,7 @@ function Productdetail() {
                             currentItems.map((item, index) => {
                                 return (
                                     <Col xs={3} lg={3} md={4} sm={6} className='cardcss' key={index}>
-                                        <Cardcmp name={item.product_name} price={item.product_cost} rating={item.product_rating} image_url={item.product_subImages[0]} id={item._id} producer={item.product_producer} />
+                                        <Cardcmp name={item.product_name} price={item.product_cost} rating={item.product_rating} image_url={item.product_image} id={item._id} producer={item.product_producer} />
                                     </Col>
                                 )
                             })

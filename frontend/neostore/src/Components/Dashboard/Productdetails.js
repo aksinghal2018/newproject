@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { Container, Image, Row, Col, Button } from 'react-bootstrap'
 import { useDispatch } from 'react-redux'
 import { encryptStorage } from '../../ConfigFiles/EncryptStorage';
-import { updateCart } from '../../Services/services';
+import { addNotifcation, updateCart } from '../../Services/services';
 function Productdetails() {
     const { id } = useParams()
     const [productdetail, setproductdetail] = useState([])
@@ -15,18 +15,20 @@ function Productdetails() {
     const [imageshow3, setimageshow3] = useState("")
     const [backgroundcolor, setbackgroundcolor] = useState("black")
     const [divdata, setdivdata] = useState(<></>)
+    const [stockdata, setstockdata] = useState(0)
     const dispatch = useDispatch()
     var data11 = ""
     async function fetch() {
 
         await getproductsbyiddata(id).then(data => {
-            console.log(data.data.data[0]._id)
+            console.log(data.data.data[0])
             setproductdetail(data.data.data[0])
-            setimageshow(data.data.data[0].product_subImages[0])
+            setimageshow(data.data.data[0].product_image)
             setimageshow1(data.data.data[0].product_subImages[0])
             setimageshow2(data.data.data[0].product_subImages[1])
             setimageshow3(data.data.data[0].product_subImages[2])
             setbackgroundcolor(data.data.data[0].color_id.color_name)
+            setstockdata(data.data.data[0].product_stock)
             setdivdata(<div style={{ display: "flex" }}>
             <h4>Description:</h4>{" "}<p style={{ marginLeft: "20px", fontSize: "20px",color:"black" }}>{productdetail.product_desc}</p></div>)
         })
@@ -129,6 +131,16 @@ function Productdetails() {
             alert("already added")
         }
     }
+    const notifydata=(e)=>{
+        console.log(e.target.id)
+        const iddata=e.target.id
+        document.getElementById(iddata).style.backgroundColor="#ddd"
+        document.getElementById(iddata).disabled=true
+        addNotifcation({product_id:iddata,user_id:encryptStorage.getItem('user').userid}).then(data=>{
+            console.log(data)
+            alert("notification added")
+        })
+    }
     return (
         <div >
             <Container style={{ textAlign: "center" }}>
@@ -193,7 +205,8 @@ function Productdetails() {
                             </div>
                             <Row style={{ padding: "20px" }}>
                                 <Col lg={6}>
-                                    <Button variant="primary" size="lg" style={{ width: "100%" }} onClick={addtoCart}>Add to Cart</Button>
+                                    {stockdata==0?<Button onClick={notifydata} variant="warning" id={id}>Notify me </Button>:<Button variant="primary" size="lg" style={{ width: "100%" }} onClick={addtoCart}>Add to Cart</Button>}
+                                    
                                 </Col>
                                 <Col lg={6}>
                                     <Button variant="warning" size="lg" style={{ width: "100%" }}> Rate this</Button>

@@ -4,13 +4,24 @@
 }
 .paginatecss{
     display: flex;
+    background-color: lightgray;
+    border:2px solid black;
+    margin:8px;
+    padding:7px;
+    width:100%
 }
 .paginatecss a{
     text-decoration: none;
+    color: red;
+    border:2px solid black;
+    padding: 7px;
+    background-color:lightblue;
 }
 .paginatecss li{
     list-style: none;
-    margin:20px
+    margin:8px;
+    color: darkblue;
+    margin-right: 20px;
 }
 img.hover-zoom:hover {
     transform: scale(1.25);
@@ -22,3 +33,33 @@ img.hover-zoom:hover {
 .activediv{
     border-bottom: 2px solid black;
  }
+ .Menu {
+    padding: 1rem;
+    position: relative;
+    background: #0000ff;
+    color: var(--light-text-color);
+    height: 100%;
+    color:white;
+  }
+  
+  .Menu button {
+    background: none;
+    border: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    cursor: pointer;
+    fill: var(--light-placeholder-color);
+    transition: var(--transition);
+  }
+  
+  .Menu button:hover {
+    fill: var(--light-text-color);
+  }
+
+  
+  

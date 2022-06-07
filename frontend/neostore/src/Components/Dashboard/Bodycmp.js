@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect,useContext } from 'react'
 import { Container, Row, Col, DropdownButton, Dropdown } from 'react-bootstrap'
 import Crouselcmp from './Crouselcmp'
 import { getproducts, getcategory, getproductsbyid, getcolor,getproductsbyidcolor } from '../../Services/productservices'
@@ -6,6 +6,8 @@ import Cardcmp from './Cardcmp'
 import './index.css'
 import ReactPaginate from 'react-paginate';
 import { encryptStorage } from '../../ConfigFiles/EncryptStorage'
+import { MenuContext } from 'react-flexible-sliding-menu';
+
 
 
 function Bodycmp() {
@@ -22,6 +24,7 @@ function Bodycmp() {
     const [color, setcolor] = useState([])
     const [coloritem, setcoloritem] = useState("all")
     const [sortrating, setsortrating] = useState(0)
+    const { toggleMenu } = useContext(MenuContext);
 
     useEffect(() => {
         
@@ -30,11 +33,17 @@ function Bodycmp() {
 
             encryptStorage.setItem('cart',[])
         }
-        
+        console.log(encryptStorage.getItem("user"))
         //console.log(`Loading items from ${itemOffset} to ${endOffset}`);
+        if(encryptStorage.getItem('user')!=undefined){
+            if(encryptStorage.getItem('user').usertype=='admin'){
+                window.location.replace('/admincrud')
+            }
+        }
         if(sortrating==0){
 
             getproducts().then(data => {
+                console.log(data.data.data[0])
                 var data1 = data.data.data.slice(itemOffset, endOffset)
                 data1.sort((a, b) => {
                     return a.product_rating - b.product_rating;
@@ -50,7 +59,7 @@ function Bodycmp() {
             setcategory(data.data.data)
         })
         getcolor().then(data => {
-            console.log(data.data.data)
+            //console.log(data.data.data)
             setcolor(data.data.data)
         })
 
@@ -107,7 +116,7 @@ function Bodycmp() {
     const sortbyrating=()=>{
         var data=currentItems
         data.sort((a, b) => {
-            return a.product_rating - b.product_rating;
+            return b.product_rating - a.product_rating;
         });
         console.log(data)
         setCurrentItems(data)
@@ -131,6 +140,36 @@ function Bodycmp() {
         setCurrentItems(data)
         setsortrating(Math.random())
     }
+    const filterbydata=(query)=>{
+        const endOffset = itemOffset + itemsPerPage;
+        console.log(query)
+        var data1=products
+        if(query ===  ""){
+            setCurrentItems(products.slice(itemOffset, endOffset));
+        }
+        else{
+
+            data1=data1.filter(post => {
+                if (query === "") {
+                    console.log("not include")
+                  //if query is empty
+                  return post;
+                } else if (post.product_name.toLowerCase().includes(query.toLowerCase())|
+                post.category_id.category_name.toLowerCase().includes(query.toLowerCase()) ||
+                post.product_producer.toLowerCase().includes(query.toLowerCase()) ||
+                post.product_rating.toLowerCase().includes(query.toLowerCase())
+                ) {
+                    console.log("include")
+                  //returns filtered array
+                  return post;
+                }
+              });
+              console.log(data1)
+              setCurrentItems(data1);
+        }
+          setsortrating(Math.random())
+
+    }
     const filterdata=(e)=>{
         const query=e.target.value
         const endOffset = itemOffset + itemsPerPage;
@@ -153,6 +192,23 @@ function Bodycmp() {
               });
               console.log(query)
               console.log(data1)
+              let categorydata=[]
+              category.map(item=>{
+                  categorydata.push(item.category_name.toLowerCase())
+              })
+              if(data1.length===0){
+                  console.log("empty")
+                  var a=query.split(" ")
+                  for(let i=0;i<a.length;i++){
+                      console.log(typeof(categorydata.indexOf(a[i].toLowerCase())))
+                      if((categorydata.indexOf(a[i].toLowerCase()!="-1"))){
+                          console.log("find")
+                          filterbydata(a[i])
+                          break
+                      }
+                  }
+                  console.log(a)
+              }
               setCurrentItems(data1);
         }
           setsortrating(Math.random())
@@ -160,8 +216,8 @@ function Bodycmp() {
     }
     return (
         <div>
-        
             <Crouselcmp />
+            
             <div style={{ textAlign: "center", marginTop: "20px" }} >
                 <h1>Popular Product</h1>
                 <input placeholder="Search" onChange={filterdata} />
@@ -206,7 +262,7 @@ function Bodycmp() {
                                 currentItems.map((item, index) => {
                                     return (
                                         <Col xs={3} lg={3} md={4} sm={6} className='cardcss' key={index}>
-                                            <Cardcmp name={item.product_name} price={item.product_cost} rating={item.product_rating} image_url={item.product_subImages[0]} id={item._id} producer={item.product_producer} />
+                                            <Cardcmp name={item.product_name} price={item.product_cost} rating={item.product_rating} image_url={item.product_image} id={item._id} producer={item.product_producer} stock={item.product_stock} data={currentItems} />
                                         </Col>
                                     )
                                 })

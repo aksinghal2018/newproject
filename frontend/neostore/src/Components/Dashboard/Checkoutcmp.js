@@ -58,6 +58,13 @@ function Checkoutcmp() {
         const order_data=encryptStorage.getItem("cart")
         console.log(address)
         console.log(order_data)
+        if(subtotal==0){
+          alert("cart is empty")
+          window.location.replace("/")
+        }
+        else{
+
+        
         if(address=="" || paymentmethod==""){
           alert("select details")
         }
@@ -73,6 +80,7 @@ function Checkoutcmp() {
           encryptStorage.setItem('cart',[])
           })
         }
+      }
     }
     return (
         <div style={{margin:"20px"}}>

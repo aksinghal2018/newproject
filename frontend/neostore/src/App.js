@@ -22,12 +22,22 @@ import Checkoutcmp from "./Components/Dashboard/Checkoutcmp";
 import Productdetail from "./Components/Products/Productdetail";
 import Mapcmp from "./Components/Mapcmp";
 import Addaddress from "./Components/Dashboard/Profile/Addaddress";
+import NotFound from "./Components/Dashboard/Notfound";
+import CartEmpty from "./Components/CartEmpty";
+import LoginAdmin from "./Components/Loginregister/LoginAdmin";
+import AdminCrud from "./Components/AdminCrud";
+import AllOrder from "./Components/Orders/AllOrder"
+import MenuProvider from 'react-flexible-sliding-menu';
+import Notifications from './Components/Dashboard/Notifcaitons'
+import AdminNotification from "./Components/AdminNotification";
+
 function App() {
   return (
+    <MenuProvider MenuComponent={Notifications} width="30%">
     <div className="App">
       <Router>
       <Headercmp />
-      <div>
+      <div style={{display:"flex",flexDirection:"column",minHeight:"40vh"}}>
         <Switch>
           <Route path="/aboutus">
             <Aboutus />
@@ -35,11 +45,20 @@ function App() {
           <Route path="/login">
             <Login />
           </Route>
+          <Route path="/loginadmin">
+            <LoginAdmin />
+          </Route>
+          <Route path="/admincrud">
+            <AdminCrud />
+          </Route>
           <Route path="/register">
             <Register />
           </Route>
           <Route path="/cart" exact>
             <Cartcmp />
+          </Route>
+          <Route path="/cartempty" exact>
+            <CartEmpty />
           </Route>
           <Route path="/" exact>
             <Dashboard />
@@ -74,11 +93,21 @@ function App() {
           <Route path="/addaddress">
             <Addaddress />
           </Route>
+          <Route path="/allorder">
+            <AllOrder />
+          </Route>
+          <Route path="/adminnotificaitons">
+            <AdminNotification />
+          </Route>
+          <Route>
+            <NotFound />
+          </Route>
         </Switch>
       </div>
             <Footercmp />
     </Router>
       </div>
+      </MenuProvider>
   );
 }
 

@@ -33,17 +33,28 @@ function Cartcmp() {
     encryptStorage.getItem("cart").map((item)=>{
       sumitem=sumitem+item.quantity*item.price
     })
+    if(sumitem==0){
+      alert("cart is empty !!!!!!!")
+      window.location.replace("/")
+    }
     setsubtotal(sumitem)
     setgst(Math.floor(sumitem*0.05))
   }, [state])
   const incrementquantity=(e)=>{
-    const id=e.target.id;
+    const id1=e.target.id;
+    const id=id1.split("_")[1]
+    console.log(id)
     var data1=encryptStorage.getItem("cart")
-    data1[id].quantity=data1[id].quantity+1
-    encryptStorage.setItem("cart",data1)
-    setstate(Math.random())
-    updateCart({email:encryptStorage.getItem('user').email,cart_data:data1}).then(data=>
-      console.log(data))
+    if(data1[id].quantity+1<=data1[id].stock){
+      data1[id].quantity=data1[id].quantity+1
+      encryptStorage.setItem("cart",data1)
+      setstate(Math.random())
+      updateCart({email:encryptStorage.getItem('user').email,cart_data:data1}).then(data=>
+        console.log(data))
+    }
+    else{
+      document.getElementById(id1).disabled=true
+    }
   }
   const decrementquantity=(e)=>{
     const id=e.target.id;
@@ -117,17 +128,17 @@ function Cartcmp() {
       </td>
       <td><Row style={{padding:"5px"}}>
         <Col lg={4}>
-        <Button variant={"danger"} style={{borderRadius:"50%",marginTop:"50%"}} id={index} onClick={decrementquantity} >-</Button>
+        <Button variant={"danger"}  style={{borderRadius:"50%",marginTop:"50%"}} id={index} onClick={decrementquantity} >-</Button>
         </Col>
         <Col lg={4} style={{marginTop:"12%",textAlign:"center"}}>
         <h4>{item.quantity}</h4>
         </Col>
         <Col lg={4}>
-        <Button variant={"danger"} style={{borderRadius:"50%",marginTop:"50%"}} id={index} onClick={incrementquantity}>+</Button>
+        <Button variant={"danger"} className={index} style={{borderRadius:"50%",marginTop:"50%"}} id={`inc_${index}`} onClick={incrementquantity}>+</Button>
         </Col></Row></td>
       <td><h4>{item.price}</h4></td>
       <td><h4>{item.price*item.quantity}</h4></td>
-      <td><Button variant='danger' onClick={()=>removeitem(index)}><i class="fa fa-trash"></i></Button></td>
+      <td><Button variant='danger' onClick={()=>removeitem(index)}><i className="fa fa-trash"></i></Button></td>
     </tr>
         )
       })
